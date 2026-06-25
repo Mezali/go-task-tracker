@@ -35,3 +35,8 @@ https://roadmap.sh/projects/task-tracker
 - Do not use any external libraries or frameworks to build this project.
 
 - Ensure to handle errors and edge cases gracefully.
+
+---
+
+### DISCLAIMER 
+this project didn't use any kind of AI tool or code generation.
