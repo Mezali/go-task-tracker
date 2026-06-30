@@ -2,6 +2,7 @@ package crud
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/Mezali/go-task-tracker/internal/models"
 )
@@ -11,9 +12,9 @@ func CreateTask(TaskFile []models.Task, NewTask string, Index uint) []byte {
 	var modelTask models.Task
 	modelTask.Id = Index
 	modelTask.Description = NewTask
+	modelTask.CreateAt = time.Now()
 
 	TaskFile = append(TaskFile, modelTask)
-	// fmt.Println(TaskFile)
 
 	file, _ := json.MarshalIndent(TaskFile, "", "  ")
 	return file

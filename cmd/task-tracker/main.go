@@ -94,15 +94,28 @@ func main() {
 		}
 
 	case "update":
-		
+		TaskId, _ := strconv.Atoi(Arguments[2])
+		File := crud.Update(File, uint(TaskId), Arguments[3])
+		os.WriteFile(JsonFileName, File, 0644)
+	case "mark-done":
+		TaskId, _ := strconv.Atoi(Arguments[2])
+		isBool, _ := strconv.ParseBool(Arguments[3])
+		File = crud.MarkDone(File, uint(TaskId), isBool)
 
+		os.WriteFile(JsonFileName, File, 0644)
+	case "mark-in-progress":
+		TaskId, _ := strconv.Atoi(Arguments[2])
+		isBool, _ := strconv.ParseBool(Arguments[3])
+		File = crud.MarkProgress(File, uint(TaskId), isBool)
+		
+		os.WriteFile(JsonFileName, File, 0644)
 	case "delete":
 		// os.Args returns a String, so convert it into a int
 		delIndex, _ := strconv.Atoi(Arguments[2])
 		// Delete the task in the struct
 		File = crud.DeleteTask(File, uint(delIndex))
 		// Write to file
-		os.WriteFile(JsonFileName, File, 0664)
+		os.WriteFile(JsonFileName, File, 0644)
 	default:
 		printUsage()
 	}

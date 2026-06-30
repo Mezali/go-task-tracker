@@ -6,18 +6,18 @@ import (
 	"github.com/Mezali/go-task-tracker/internal/models"
 )
 
-var model []models.Task
+var deModel []models.Task
 
 func DeleteTask(File []byte, TaskId uint) []byte {
-	json.Unmarshal(File, &model)
+	json.Unmarshal(File, &deModel)
 
-	for index, value := range model {
+	for index, value := range deModel {
 		if value.Id == TaskId {
-			model = append(model[:index], model[index+1:]...)
+			deModel = append(deModel[:index], deModel[index+1:]...)
 			break
 		}
 	}
-	model, _ := json.MarshalIndent(model, "", "  ")
+	deModel, _ := json.MarshalIndent(deModel, "", "  ")
 	
-	return model
+	return deModel
 }
