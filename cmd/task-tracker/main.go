@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/Mezali/go-task-tracker/internal/commands"
 	"github.com/Mezali/go-task-tracker/internal/crud"
@@ -94,8 +95,14 @@ func main() {
 
 	case "update":
 		
-	case "delete":
 
+	case "delete":
+		// os.Args returns a String, so convert it into a int
+		delIndex, _ := strconv.Atoi(Arguments[2])
+		// Delete the task in the struct
+		File = crud.DeleteTask(File, uint(delIndex))
+		// Write to file
+		os.WriteFile(JsonFileName, File, 0664)
 	default:
 		printUsage()
 	}
