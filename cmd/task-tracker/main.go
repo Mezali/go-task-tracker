@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/Mezali/go-task-tracker/internal/commands"
+	"github.com/Mezali/go-task-tracker/internal/crud"
+	"github.com/Mezali/go-task-tracker/internal/models"
 )
 
 func printUsage() {
@@ -25,18 +26,9 @@ Commands:
 	fmt.Print(usage)
 }
 
-type Task struct {
-	Id           uint      `json:"id"`
-	Description  string    `json:"description"`
-	Status       string    `json:"status"`
-	IsDone       bool      `json:"isDone"`
-	IsInProgress bool      `json:"isInProgress"`
-	CreateAt     time.Time `json:"createAt"`
-	UpdateAt     time.Time `json:"UpdateAt"`
-}
-
 var JsonFileName string = "tasks.json"
 var Arguments []string
+var TaskFile []models.Task
 
 // Run all validations and checks before starting
 func init() {
@@ -50,12 +42,11 @@ func init() {
 	Arguments = os.Args
 
 	_, error := os.Stat(JsonFileName) // find the damm file
-	if error != nil && os.Args[1] != "init" {
-		fmt.Println("Database not found...\nPlease run:\ntask-tracker init")
+	if error != nil && Arguments[1] != "init" {
+		fmt.Println("Database not found...\nPlease run: task-tracker init")
 		os.Exit(0)
 	}
 
-	// check if the json file is valid
 	file, error := os.ReadFile(JsonFileName)
 	if error != nil && os.Args[1] != "init" {
 		log.Fatalf("Error reading the file: %v", error)
@@ -63,18 +54,47 @@ func init() {
 
 	// Checks if the json is valid
 	if !json.Valid(file) && os.Args[1] != "init" {
-		fmt.Println("Invalid Json...\nPlease create a new one by running:\ntask-tracker init")
+		fmt.Println("Invalid Json...\nPlease create a new one by running: task-tracker init")
 		os.Remove(JsonFileName)
 	}
 }
 
 func main() {
 
+	// Open the json file
+	File, err := os.ReadFile(JsonFileName)
+
+	if err != nil && Arguments[1] != "init" {
+		log.Fatalf("Error opening the file: %v", err)
+	}
+
+	json.Unmarshal(File, &TaskFile)
+
 	switch Arguments[1] {
-	case "init":
+	case "init": // Init the database
+
 		commands.InitDb(JsonFileName)
-	 case "add":
-		fmt.Println("teste")
+
+	case "add": // Create a task
+
+		// We need first to read all the database to index the new task
+		index := crud.IndexJson(File) // DONE
+
+		// Now we need to create the task
+		File = crud.CreateTask(TaskFile, Arguments[2], uint(index))
+
+		// Write in the file
+		os.WriteFile(JsonFileName, File, 0644)
+
+	case "list": // List or Search for a task
+		List := crud.List(File)
+		for index, value := range List {
+			fmt.Printf("%v. %v\n", index+1, value)
+		}
+
+	case "update":
+		
+	case "delete":
 
 	default:
 		printUsage()
